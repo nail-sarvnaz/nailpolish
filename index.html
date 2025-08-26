@@ -39,7 +39,6 @@
     .meta{ margin-top:14px; font-size:13px; color:#666; display:flex; justify-content:space-between; flex-wrap:wrap;}
     .meta a{ color:#ff9eb5; font-weight:700; text-decoration:none;}
     .hint{ color:#b91c4a; font-weight:700; font-size:13px; min-height:18px;}
-    /* fix datepicker z-index */
     .p-datepicker-container{ z-index:9999 !important; }
   </style>
 </head>
@@ -83,7 +82,6 @@
       <input type="text" id="datepicker" class="datepicker-input" placeholder="انتخاب تاریخ" />
 
       <div class="price-box" id="priceBox">لطفاً خدمت و تاریخ را انتخاب کنید</div>
-
       <div id="timeList" class="times" aria-live="polite" aria-atomic="true"></div>
       <div class="hint" id="formHint" aria-live="assertive"></div>
 
@@ -146,7 +144,7 @@ function generateSlots(){
 
 function validPhone(s){ const digits=s.replace(/\D/g,''); return /^9\d{9}$/.test(digits)||/^09\d{9}$/.test(digits); }
 
-$el('#payBtn').addEventListener('click',()=>{
+$el('#payBtn').addEventListener('click', async ()=>{
     const fullname=$el('#fullname').value.trim();
     const phone=$el('#phone').value.trim();
     const serviceEl=$el('#service').selectedOptions[0];
@@ -160,17 +158,34 @@ $el('#payBtn').addEventListener('click',()=>{
     if(!selectedStart){ $el('#formHint').textContent='لطفاً یک زمان از لیست انتخاب کنید.'; return; }
 
     const duration=Number(serviceEl.dataset.duration), start=Number(selectedStart);
-    if(hasConflict(date,start,duration)){ $el('#formHint').textContent='متاسفانه این ساعت هم‌اکنون رزرو شده است. یک زمان دیگر انتخاب کنید.'; generateSlots(); return; }
 
-    const reservations=loadReservations();
-    const reservation={ id:'r_'+Date.now().toString(36), name:fullname, phone:phone, service:serviceEl.textContent, serviceValue:serviceEl.value, date:date, start:start, end:start+duration, createdAt:new Date().toISOString() };
-    reservations.push(reservation); saveReservations(reservations);
+    const reservation={
+        name: fullname,
+        phone: phone,
+        service: serviceEl.textContent,
+        price: serviceEl.value,
+        date: date,
+        start: start,
+        end: start+duration
+    };
 
-    const deposit=Math.round(Number(serviceEl.value)*0.3);
-    alert(`نوبت ثبت شد:\n${reservation.service} — ${date} — ${formatPersianHour(reservation.start)}\nپیش‌پرداخت: ${deposit.toLocaleString('fa-IR')} تومان\n(درگاه پرداخت بعداً متصل می‌شود)`);
-
-    delete $el('#timeList').dataset.selected;
-    generateSlots();
+    try {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbyqCQRh4Iy3OFLKrK8qzKXYOjBEjBngbZFxYKhuFNl4iZGuCayRwjqry8rLLcyttUmzDA/exec', {
+            method: 'POST',
+            body: JSON.stringify(reservation)
+        });
+        const result = await response.json();
+        if(result.status==='success'){
+            alert(`نوبت ثبت شد:\n${reservation.service} — ${date} — ${formatPersianHour(reservation.start)}\nپیش‌پرداخت: ${Math.round(Number(serviceEl.value)*0.3).toLocaleString('fa-IR')} تومان`);
+            delete $el('#timeList').dataset.selected;
+            generateSlots();
+        } else {
+            $el('#formHint').textContent='خطا در ثبت رزرو، لطفاً دوباره تلاش کنید.';
+        }
+    } catch(err){
+        console.error(err);
+        $el('#formHint').textContent='خطا در اتصال به سرور.';
+    }
 });
 
 window.addEventListener('load',()=>{
