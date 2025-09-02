@@ -39,6 +39,8 @@
     .meta{ margin-top:14px; font-size:13px; color:#666; display:flex; justify-content:space-between; flex-wrap:wrap;}
     .meta a{ color:#ff9eb5; font-weight:700; text-decoration:none;}
     .hint{ color:#b91c4a; font-weight:700; font-size:13px; min-height:18px;}
+    .day-info { text-align: center; margin: 10px 0; font-weight: 700; color: #2E86C1; }
+    .friday-message { text-align: center; padding: 20px; color: #b91c4a; font-weight: 700; }
     .p-datepicker-container{ z-index:9999 !important; }
   </style>
 </head>
@@ -83,6 +85,7 @@
       <input type="text" id="datepicker" class="datepicker-input" placeholder="انتخاب تاریخ" />
 
       <div class="price-box" id="priceBox">لطفاً خدمت و تاریخ را انتخاب کنید</div>
+      <div id="dayInfo" class="day-info"></div>
       <div id="timeList" class="times" aria-live="polite" aria-atomic="true"></div>
       <div class="hint" id="formHint" aria-live="assertive"></div>
 
@@ -102,68 +105,97 @@ const $el = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 const pad2 = n => String(n).padStart(2,'0');
 
-const WORK_START_ODD=12*60;  // فرد از 12 ظهر
-const WORK_START_EVEN=13*60; // زوج از 13 ظهر
-const LAST_SLOT=17*60;       // آخرین تایم رزرو
-const STEP=60;               // فاصله هر رزرو یک ساعت
-const KEY='nail_reservations_final';
+const WORK_START_ODD = 12 * 60;  // فرد از 12 ظهر
+const WORK_START_EVEN = 13 * 60; // زوج از 13 ظهر
+const LAST_SLOT = 17 * 60;       // آخرین تایم رزرو
+const STEP = 60;                 // فاصله هر رزرو یک ساعت
+const KEY = 'nail_reservations_final';
 
 // تابع تبدیل دقیقه به ساعت فارسی
 function formatPersianHour(minutes){
-    let h=Math.floor(minutes/60), m=minutes%60;
-    const suffix=h>=12?'بعدازظهر':'قبل‌ازظهر';
-    let hour=h>12?h-12:h;
-    if(hour===0) hour=12;
-    const pers=(str)=>str.replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
-    return pers(String(hour))+':'+pers(pad2(m))+' '+suffix;
+    let h = Math.floor(minutes/60), m = minutes%60;
+    const suffix = h >= 12 ? 'بعدازظهر' : 'قبل‌ازظهر';
+    let hour = h > 12 ? h - 12 : h;
+    if(hour === 0) hour = 12;
+    const pers = (str) => str.replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+    return pers(String(hour)) + ':' + pers(pad2(m)) + ' ' + suffix;
 }
 
 // بارگذاری/ذخیره رزروها
 function loadReservations(){ 
-    try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[];} 
+    try { return JSON.parse(localStorage.getItem(KEY) || '[]') } catch(e) { return []; } 
 }
-function saveReservations(arr){ localStorage.setItem(KEY,JSON.stringify(arr)); }
+function saveReservations(arr){ localStorage.setItem(KEY, JSON.stringify(arr)); }
 
 // بررسی تداخل با رزرو قبلی
-function hasConflict(dateStr,startMin,durationMin){
-    const reservations=loadReservations();
-    const newStart=startMin;
-    const newEnd=startMin+durationMin;
-    return reservations.some(r=>{
-        if(r.date!==dateStr) return false;
-        const existingStart=r.start;
-        const existingEnd=r.end;
-        return !(newEnd<=existingStart||newStart>=existingEnd);
+function hasConflict(dateStr, startMin, durationMin){
+    const reservations = loadReservations();
+    const newStart = startMin;
+    const newEnd = startMin + durationMin;
+    return reservations.some(r => {
+        if(r.date !== dateStr) return false;
+        const existingStart = r.start;
+        const existingEnd = r.end;
+        return !(newEnd <= existingStart || newStart >= existingEnd);
     });
 }
 
 // تولید تایم‌های رزرو
 function generateSlots(){
     const serviceEl = $el('#service').selectedOptions[0];
-    const date = $el('#datepicker').val || $el('#datepicker').value;
+    const date = $el('#datepicker').value;
     const container = $el('#timeList');
-    container.innerHTML='';
-    $el('#formHint').textContent='';
+    const dayInfo = $el('#dayInfo');
+    
+    container.innerHTML = '';
+    dayInfo.innerHTML = '';
+    $el('#formHint').textContent = '';
+    
     if(!serviceEl || !serviceEl.dataset.duration || !date) return;
 
     const duration = Number(serviceEl.dataset.duration);
-    const persDate = date.split('/').map(x=>parseInt(x)); // YYYY/MM/DD
-    const day = new persianDate([persDate[0], persDate[1]-1, persDate[2]]).day();
-    const startWork = (day%2===1)? WORK_START_ODD : WORK_START_EVEN;
-
-    for(let t=startWork; t+duration<=LAST_SLOT; t+=STEP){
+    const persDate = date.split('/').map(x => parseInt(x));
+    
+    // ایجاد تاریخ شمسی و تشخیص روز هفته
+    const pDate = new persianDate([persDate[0], persDate[1], persDate[2]]);
+    const dayOfWeek = pDate.day(); // 0: شنبه، 1: یکشنبه، ..., 6: جمعه
+    const dayOfMonth = pDate.date();
+    
+    // بررسی جمعه
+    if(dayOfWeek === 6) { // جمعه
+        container.innerHTML = `
+            <div class="friday-message">
+                <div style="font-size: 24px; margin-bottom: 10px;">❌</div>
+                <div>جمعه‌ها تعطیل هستیم</div>
+                <p>لطفاً روز دیگری را برای رزرو انتخاب کنید.</p>
+            </div>
+        `;
+        $el('#payBtn').disabled = true;
+        return;
+    }
+    
+    // تشخیص زوج یا فرد بودن روز ماه و نمایش پیام
+    const isEvenDay = dayOfMonth % 2 === 0;
+    const startWork = isEvenDay ? WORK_START_EVEN : WORK_START_ODD;
+    
+    dayInfo.textContent = isEvenDay ? 
+        "امروز روز زوج است، رزرو از ساعت ۱۳ امکان‌پذیر است" : 
+        "امروز روز فرد است، رزرو از ساعت ۱۲ امکان‌پذیر است";
+    
+    // تولید اسلات‌های زمانی
+    for(let t = startWork; t + duration <= LAST_SLOT; t += STEP){
         const btn = document.createElement('button');
-        btn.type='button';
-        btn.className='slot';
+        btn.type = 'button';
+        btn.className = 'slot';
         btn.textContent = formatPersianHour(t);
 
-        if(hasConflict(date,t,duration)){
+        if(hasConflict(date, t, duration)){
             btn.classList.add('taken'); 
-            btn.disabled=true; 
-            btn.setAttribute('aria-disabled','true');
+            btn.disabled = true; 
+            btn.setAttribute('aria-disabled', 'true');
         } else {
-            btn.addEventListener('click', ()=>{
-                $$('.slot').forEach(s=>s.classList.remove('selected'));
+            btn.addEventListener('click', () => {
+                $$('.slot').forEach(s => s.classList.remove('selected'));
                 btn.classList.add('selected'); 
                 container.dataset.selected = String(t);
             });
@@ -174,12 +206,14 @@ function generateSlots(){
 
     if(!container.querySelector('.slot:not(.taken)')){
         const msg = document.createElement('div');
-        msg.style.color='#b91c4a';
-        msg.style.fontWeight='700';
-        msg.style.textAlign='center';
-        msg.textContent='متاسفانه برای این تاریخ هیچ زمان خالی‌ای وجود ندارد.';
+        msg.style.color = '#b91c4a';
+        msg.style.fontWeight = '700';
+        msg.style.textAlign = 'center';
+        msg.textContent = 'متاسفانه برای این تاریخ هیچ زمان خالی‌ای وجود ندارد.';
         container.appendChild(msg);
     }
+    
+    $el('#payBtn').disabled = !container.querySelector('.slot.selected');
 }
 
 // بروزرسانی قیمت پیش‌پرداخت
@@ -188,61 +222,85 @@ function updatePriceBox(){
     const price = sel.value;
     const box = $el('#priceBox');
     if(!price){
-        box.textContent='لطفاً خدمت و تاریخ را انتخاب کنید';
+        box.textContent = 'لطفاً خدمت و تاریخ را انتخاب کنید';
         return;
     }
-    const deposit = Math.round(Number(price)*0.3);
-    box.textContent='پیش‌پرداخت: '+deposit.toLocaleString('fa-IR')+' تومان';
+    const deposit = Math.round(Number(price) * 0.3);
+    box.textContent = 'پیش‌پرداخت: ' + deposit.toLocaleString('fa-IR') + ' تومان';
 }
 
 // اعتبارسنجی شماره موبایل
 function validPhone(s){ 
-    const digits=s.replace(/\D/g,''); 
-    return /^9\d{9}$/.test(digits)||/^09\d{9}$/.test(digits); 
+    const digits = s.replace(/\D/g, ''); 
+    return /^9\d{9}$/.test(digits) || /^09\d{9}$/.test(digits); 
 }
 
-// تاریخ شمسی با روز درست ایران
-let now = new Date();
-let pdNow = new persianDate(now);
-
+// تنظیم datepicker
 $("#datepicker").persianDatepicker({
     format: "YYYY/MM/DD",
-    minDate: pdNow,
+    minDate: new persianDate(),
     autoClose: true,
-    onSelect: function(){ generateSlots(); updatePriceBox(); }
+    onSelect: function() { 
+        generateSlots(); 
+        updatePriceBox(); 
+    }
 });
 
 // تغییر خدمت
-$el('#service').addEventListener('change', ()=>{
+$el('#service').addEventListener('change', () => {
     updatePriceBox();
     generateSlots();
 });
 
-// ثبت رزرو (ارسال به گوگل شیت یا ذخیره لوکال)
-$el('#payBtn').addEventListener('click', async ()=>{
+// تغییر فیلدها
+$el('#fullname').addEventListener('input', () => {
+    $el('#payBtn').disabled = !$el('#timeList').querySelector('.slot.selected');
+});
+$el('#phone').addEventListener('input', () => {
+    $el('#payBtn').disabled = !$el('#timeList').querySelector('.slot.selected');
+});
+
+// ثبت رزرو
+$el('#payBtn').addEventListener('click', async () => {
     const fullname = $el('#fullname').value.trim();
     const phone = $el('#phone').value.trim();
     const serviceEl = $el('#service').selectedOptions[0];
-    const date = $el('#datepicker').val || $el('#datepicker').value;
+    const date = $el('#datepicker').value;
     const selectedStart = $el('#timeList').dataset.selected;
 
-    if(!fullname||!phone){ $el('#formHint').textContent='نام و شماره موبایل باید وارد شود.'; return; }
-    if(!validPhone(phone)){ $el('#formHint').textContent='شماره موبایل معتبر وارد کنید (مثال: 09123456789).'; return; }
-    if(!serviceEl||!serviceEl.dataset.duration){ $el('#formHint').textContent='لطفاً یک خدمت انتخاب کنید.'; return; }
-    if(!date){ $el('#formHint').textContent='لطفاً یک تاریخ انتخاب کنید.'; return; }
-    if(!selectedStart){ $el('#formHint').textContent='لطفاً یک زمان از لیست انتخاب کنید.'; return; }
+    if(!fullname || !phone){ 
+        $el('#formHint').textContent = 'نام و شماره موبایل باید وارد شود.'; 
+        return; 
+    }
+    if(!validPhone(phone)){ 
+        $el('#formHint').textContent = 'شماره موبایل معتبر وارد کنید (مثال: 09123456789).'; 
+        return; 
+    }
+    if(!serviceEl || !serviceEl.dataset.duration){ 
+        $el('#formHint').textContent = 'لطفاً یک خدمت انتخاب کنید.'; 
+        return; 
+    }
+    if(!date){ 
+        $el('#formHint').textContent = 'لطفاً یک تاریخ انتخاب کنید.'; 
+        return; 
+    }
+    if(!selectedStart){ 
+        $el('#formHint').textContent = 'لطفاً یک زمان از لیست انتخاب کنید.'; 
+        return; 
+    }
 
-    const duration=Number(serviceEl.dataset.duration), start=Number(selectedStart);
-    const code=Math.floor(100000+Math.random()*900000);
+    const duration = Number(serviceEl.dataset.duration);
+    const start = Number(selectedStart);
+    const code = Math.floor(100000 + Math.random() * 900000);
 
-    const reservation={
+    const reservation = {
         name: fullname,
         phone: phone,
         service: serviceEl.textContent,
         price: serviceEl.value,
         date: date,
         start: start,
-        end: start+duration,
+        end: start + duration,
         code: code
     };
 
@@ -252,8 +310,31 @@ $el('#payBtn').addEventListener('click', async ()=>{
     saveReservations(allRes);
 
     alert(`نوبت ثبت شد:\n${reservation.service} — ${date} — ${formatPersianHour(reservation.start)}\nکد رهگیری: ${reservation.code}\nپیش‌پرداخت: ${Math.round(Number(serviceEl.value)*0.3).toLocaleString('fa-IR')} تومان`);
+    
+    // ریست فرم
     delete $el('#timeList').dataset.selected;
-    generateSlots();
+    $el('#fullname').value = '';
+    $el('#phone').value = '';
+    $el('#service').selectedIndex = 0;
+    $el('#datepicker').value = '';
+    $el('#priceBox').textContent = 'لطفاً خدمت و تاریخ را انتخاب کنید';
+    $el('#dayInfo').textContent = '';
+    $el('#timeList').innerHTML = '';
+    $el('#payBtn').disabled = true;
+});
+
+// مقداردهی اولیه
+window.addEventListener('load', () => {
+    // حذف تاریخ‌های گذشته از datepicker
+    $("#datepicker").persianDatepicker({
+        format: "YYYY/MM/DD",
+        minDate: new persianDate(),
+        autoClose: true,
+        onSelect: function() { 
+            generateSlots(); 
+            updatePriceBox(); 
+        }
+    });
 });
 
 })(jQuery);
