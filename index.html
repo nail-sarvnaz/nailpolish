@@ -1,99 +1,99 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>رزرو نوبت ناخن — Nail_Sarvnaz</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>رزرو نوبت ناخن — Nail_Sarvnaz</title>
 
-  <!-- فونت وزیر -->
-  <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003.04/fonts/font-face.css" rel="stylesheet">
+<!-- فونت وزیر -->
+<link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003.04/fonts/font-face.css" rel="stylesheet">
 
-  <!-- Persian Datepicker -->
-  <link href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css" rel="stylesheet"/>
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/persian-date/dist/persian-date.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+<!-- Persian Datepicker -->
+<link href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/persian-date/dist/persian-date.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
 
-  <style>
-    body{ margin:0; font-family:"Vazirmatn",sans-serif; background:#000 url('logo-bg.png') no-repeat center center fixed; background-size:cover; color:#111; }
-    .overlay{ min-height:100vh; background:rgba(0,0,0,0.45); display:flex; justify-content:center; align-items:center; padding:20px; box-sizing:border-box;}
-    .panel{ max-width:620px; width:100%; background:rgba(255,255,255,0.95); border-radius:12px; padding:24px; box-shadow:0 10px 30px rgba(0,0,0,0.18);}
-    header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;}
-    .brand{ display:flex; align-items:center; gap:12px;}
-    .logo-mark{ width:50px;height:50px;border-radius:50%; display:grid; place-items:center; color:#ff9eb5; font-weight:900;}
-    h1{ font-size:20px; margin:0; color:#c2185b;}
-    p.lead{ font-size:14px; color:#666; margin:6px 0 0;}
-    form{ display:grid; gap:10px; margin-top:6px;}
-    label{ font-weight:700; font-size:13px; color:#333;}
-    input, select{ width:100%; padding:12px; border-radius:10px; border:1px solid #e6e6e6; font-size:15px; background:#fff;}
-    .row{ display:flex; gap:10px;}
-    .row .col{ flex:1;}
-    .price-box{ margin-top:6px; background:linear-gradient(90deg,#ff9eb5,#e07090); color:#fff; padding:12px; border-radius:10px; text-align:center; font-weight:800;}
-    .times{ display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; justify-content:center;}
-    .slot{ padding:11px 16px; border-radius:999px; border:1px solid #ff9eb5; background:#fff; cursor:pointer; font-weight:700; transition:all .18s ease; min-width:96px; text-align:center;}
-    .slot:hover{ background:#fff0f6; transform:translateY(-3px);}
-    .slot.taken{ background:#f2f2f2; color:#999; border-color:#ddd; cursor:not-allowed; transform:none;}
-    .slot.selected{ background:#ff9eb5; color:#fff; border-color:transparent;}
-    .pay-btn{ width:100%; padding:14px; margin-top:10px; border-radius:10px; background:linear-gradient(90deg,#ff9eb5,#e07090); color:#fff; font-weight:900; border:none; cursor:pointer;}
-    .pay-btn:active{ transform:translateY(1px);}
-    .meta{ margin-top:14px; font-size:13px; color:#666; display:flex; justify-content:space-between; flex-wrap:wrap;}
-    .meta a{ color:#ff9eb5; font-weight:700; text-decoration:none;}
-    .hint{ color:#b91c4a; font-weight:700; font-size:13px; min-height:18px;}
-    .p-datepicker-container{ z-index:9999 !important; }
-  </style>
+<style>
+body{ margin:0; font-family:"Vazirmatn",sans-serif; background:#000 url('logo-bg.png') no-repeat center center fixed; background-size:cover; color:#111; }
+.overlay{ min-height:100vh; background:rgba(0,0,0,0.45); display:flex; justify-content:center; align-items:center; padding:20px; box-sizing:border-box;}
+.panel{ max-width:620px; width:100%; background:rgba(255,255,255,0.95); border-radius:12px; padding:24px; box-shadow:0 10px 30px rgba(0,0,0,0.18);}
+header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;}
+.brand{ display:flex; align-items:center; gap:12px;}
+.logo-mark{ width:50px;height:50px;border-radius:50%; display:grid; place-items:center; color:#ff9eb5; font-weight:900;}
+h1{ font-size:20px; margin:0; color:#c2185b;}
+p.lead{ font-size:14px; color:#666; margin:6px 0 0;}
+form{ display:grid; gap:10px; margin-top:6px;}
+label{ font-weight:700; font-size:13px; color:#333;}
+input, select{ width:100%; padding:12px; border-radius:10px; border:1px solid #e6e6e6; font-size:15px; background:#fff;}
+.row{ display:flex; gap:10px;}
+.row .col{ flex:1;}
+.price-box{ margin-top:6px; background:linear-gradient(90deg,#ff9eb5,#e07090); color:#fff; padding:12px; border-radius:10px; text-align:center; font-weight:800;}
+.times{ display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; justify-content:center;}
+.slot{ padding:11px 16px; border-radius:999px; border:1px solid #ff9eb5; background:#fff; cursor:pointer; font-weight:700; transition:all .18s ease; min-width:96px; text-align:center;}
+.slot:hover{ background:#fff0f6; transform:translateY(-3px);}
+.slot.taken{ background:#f2f2f2; color:#999; border-color:#ddd; cursor:not-allowed; transform:none;}
+.slot.selected{ background:#ff9eb5; color:#fff; border-color:transparent;}
+.pay-btn{ width:100%; padding:14px; margin-top:10px; border-radius:10px; background:linear-gradient(90deg,#ff9eb5,#e07090); color:#fff; font-weight:900; border:none; cursor:pointer;}
+.pay-btn:active{ transform:translateY(1px);}
+.meta{ margin-top:14px; font-size:13px; color:#666; display:flex; justify-content:space-between; flex-wrap:wrap;}
+.meta a{ color:#ff9eb5; font-weight:700; text-decoration:none;}
+.hint{ color:#b91c4a; font-weight:700; font-size:13px; min-height:18px;}
+.p-datepicker-container{ z-index:9999 !important; }
+</style>
 </head>
 <body>
 <div class="overlay">
-  <main class="panel">
-    <header>
-      <div class="brand">
-        <div class="logo-mark">S</div>
-        <div>
-          <h1>Nail_Sarvnaz — رزرو نوبت</h1>
-          <p class="lead">زیبایی دستانت آغاز اعتماد به نفس توست</p>
-        </div>
-      </div>
-      <div style="text-align:left; font-size:13px; color:#666;">
-        📍 میدان گلشهر<br>ساختمان ستاره، طبقه ۳، واحد ۸
-      </div>
-    </header>
+<main class="panel">
+<header>
+<div class="brand">
+<div class="logo-mark">S</div>
+<div>
+<h1>Nail_Sarvnaz — رزرو نوبت</h1>
+<p class="lead">زیبایی دستانت آغاز اعتماد به نفس توست</p>
+</div>
+</div>
+<div style="text-align:left; font-size:13px; color:#666;">
+📍 میدان گلشهر<br>ساختمان ستاره، طبقه ۳، واحد ۸
+</div>
+</header>
 
-    <form id="bookingForm" autocomplete="on" novalidate>
-      <div class="row">
-        <div class="col">
-          <label for="fullname">نام و نام خانوادگی *</label>
-          <input id="fullname" name="fullname" type="text" placeholder="مثلاً سروناز محمدی" required />
-        </div>
-        <div class="col">
-          <label for="phone">شماره موبایل *</label>
-          <input id="phone" name="phone" type="tel" placeholder="09xxxxxxxxx" required />
-        </div>
-      </div>
+<form id="bookingForm" autocomplete="on" novalidate>
+<div class="row">
+<div class="col">
+<label for="fullname">نام و نام خانوادگی *</label>
+<input id="fullname" name="fullname" type="text" placeholder="مثلاً سروناز محمدی" required />
+</div>
+<div class="col">
+<label for="phone">شماره موبایل *</label>
+<input id="phone" name="phone" type="tel" placeholder="09xxxxxxxxx" required />
+</div>
+</div>
 
-      <label for="service">انتخاب خدمت *</label>
-      <select id="service" name="service" required>
-        <option value="" disabled selected>یک گزینه انتخاب کنید</option>
-        <option value="500000" data-duration="120">کاشت ناخن — ۵۰۰,۰۰۰ تومان</option>
-        <option value="340000" data-duration="120">ترمیم-لمینت — ۳۴۰,۰۰۰ تومان</option>
-        <option value="180000" data-duration="60">دست — ۱۸۰,۰۰۰ تومان</option>
-        <option value="800000" data-duration="180">دست و پا — ۸۰۰,۰۰۰ تومان</option>
-      </select>
+<label for="service">انتخاب خدمت *</label>
+<select id="service" name="service" required>
+<option value="" disabled selected>یک گزینه انتخاب کنید</option>
+<option value="500000" data-duration="120">کاشت ناخن — ۵۰۰,۰۰۰ تومان</option>
+<option value="340000" data-duration="120">ترمیم-لمینت — ۳۴۰,۰۰۰ تومان</option>
+<option value="180000" data-duration="60">پا — ۱۸۰,۰۰۰ تومان</option>
+<option value="800000" data-duration="180">دست و پا — ۸۰۰,۰۰۰ تومان</option>
+</select>
 
-      <label for="datepicker">تاریخ *</label>
-      <input type="text" id="datepicker" class="datepicker-input" placeholder="انتخاب تاریخ" />
+<label for="datepicker">تاریخ *</label>
+<input type="text" id="datepicker" class="datepicker-input" placeholder="انتخاب تاریخ" />
 
-      <div class="price-box" id="priceBox">لطفاً خدمت و تاریخ را انتخاب کنید</div>
-      <div id="timeList" class="times" aria-live="polite" aria-atomic="true"></div>
-      <div class="hint" id="formHint" aria-live="assertive"></div>
+<div class="price-box" id="priceBox">لطفاً خدمت و تاریخ را انتخاب کنید</div>
+<div id="timeList" class="times" aria-live="polite" aria-atomic="true"></div>
+<div class="hint" id="formHint" aria-live="assertive"></div>
 
-      <button type="button" id="payBtn" class="pay-btn">ثبت رزرو و پرداخت ۳۰٪</button>
+<button type="button" id="payBtn" class="pay-btn">ثبت رزرو و پرداخت ۳۰٪</button>
 
-      <div class="meta">
-        اینستاگرام: <a href="https://instagram.com/nail_sarvnaz" target="_blank" rel="noopener">@nail_sarvnaz</a>
-        <div>روزهای فرد: ۱۲ ظهر — روزهای زوج: ۱۳ ظهر</div>
-      </div>
-    </form>
-  </main>
+<div class="meta">
+اینستاگرام: <a href="https://instagram.com/nail_sarvnaz" target="_blank" rel="noopener">@nail_sarvnaz</a>
+<div>ساعت کاری: روزهای فرد ۱۲:۰۰ — ۱۸:۰۰ | روزهای زوج ۱۳:۰۰ — ۱۸:۰۰</div>
+</div>
+</form>
+</main>
 </div>
 
 <script>
@@ -102,64 +102,88 @@ const $el = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 const pad2 = n => String(n).padStart(2,'0');
 
+const WORK_START_ODD=12*60;
+const WORK_START_EVEN=13*60;
+const WORK_END=17*60; // آخرین رزرو 17:00
+const STEP=60; // فاصله رزرو 1 ساعت
+const KEY='nail_reservations_v3';
+
+function loadReservations(){ try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[];} }
+function saveReservations(arr){ localStorage.setItem(KEY,JSON.stringify(arr)); }
+
+function formatPersianHour(minutes){
+  let h=Math.floor(minutes/60), m=minutes%60;
+  const suffix=h>=12?'بعدازظهر':'قبل‌ازظهر';
+  let hour=h>12?h-12:h; if(hour===0)hour=12;
+  const pers=(str)=>str.replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+  return pers(String(hour))+':'+pers(pad2(m))+' '+suffix;
+}
+
+// تاریخ دقیق امروز بدون جابجایی روز
+const today = new persianDate();
+today.set({ hour:0, minute:0, second:0, millisecond:0 });
+
 $("#datepicker").persianDatepicker({
     format:"YYYY/MM/DD",
-    minDate:new persianDate().unix(),
+    minDate: today,
     autoClose:true,
     onSelect: function(){ generateSlots(); }
 });
 
-const KEY='nail_reservations_v1';
-const STEP=60; // فاصله رزروها ۱ ساعت
-const LAST_SLOT=17*60; // آخرین تایم ۵ بعدازظهر
-
-function loadReservations(){ try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[];} }
-function saveReservations(arr){ localStorage.setItem(KEY,JSON.stringify(arr)); }
-function formatPersianHour(minutes){ let h=Math.floor(minutes/60), m=minutes%60; const suffix=h>=12?'بعدازظهر':'قبل‌ازظهر'; let hour=h>12?h-12:h; if(hour===0)hour=12; const pers=(str)=>str.replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]); return pers(String(hour))+':'+pers(pad2(m))+' '+suffix; }
-
-$el('#service').addEventListener('change',()=>{ updatePriceBox(); generateSlots(); });
-function updatePriceBox(){ const sel=$el('#service'); const price=sel.value; const box=$el('#priceBox'); if(!price){box.textContent='لطفاً خدمت و تاریخ را انتخاب کنید'; return;} const deposit=Math.round(Number(price)*0.3); box.textContent='پیش‌پرداخت: '+deposit.toLocaleString('fa-IR')+' تومان'; }
-
-function hasConflict(dateStr,startMin,durationMin){ const reservations=loadReservations(); const newStart=startMin; const newEnd=startMin+durationMin; return reservations.some(r=>{ if(r.date!==dateStr)return false; const existingStart=r.start; const existingEnd=r.end; return !(newEnd<=existingStart||newStart>=existingEnd); }); }
+function hasConflict(dateStr,startMin,durationMin){
+    const reservations=loadReservations();
+    const newStart=startMin;
+    const newEnd=startMin+durationMin;
+    return reservations.some(r=>{
+        if(r.date!==dateStr) return false;
+        const existingStart=r.start;
+        const existingEnd=r.end;
+        return !(newEnd<=existingStart||newStart>=existingEnd);
+    });
+}
 
 function generateSlots(){
-    const serviceOpt=$el('#service').selectedOptions[0];
+    const serviceEl=$el('#service').selectedOptions[0];
     const date=$el('#datepicker').value;
     const container=$el('#timeList');
     container.innerHTML='';
     $el('#formHint').textContent='';
-    if(!serviceOpt||!serviceOpt.dataset.duration||!date)return;
+    if(!serviceEl||!serviceEl.dataset.duration||!date) return;
+    const duration=Number(serviceEl.dataset.duration);
 
-    const duration=Number(serviceOpt.dataset.duration);
-    const persDate=date.split('/').map(x=>parseInt(x));
-    const day = new Date(persDate[0], persDate[1]-1, persDate[2]).getDate();
-    const startWork = (day%2===1)? 12*60 : 13*60; // شروع فرد/زوج
+    const persDate = date.split('/').map(x=>parseInt(x));
+    const day = new persianDate().set({year:persDate[0],month:persDate[1],date:persDate[2]}).date();
+    const startWork = (day%2===1)? WORK_START_ODD : WORK_START_EVEN;
 
-    for(let t=startWork; t+duration<=LAST_SLOT; t+=STEP){
+    for(let t=startWork; t+duration<=WORK_END; t+=STEP){
         const btn=document.createElement('button');
         btn.type='button';
         btn.className='slot';
         btn.textContent=formatPersianHour(t);
+
         if(hasConflict(date,t,duration)){
             btn.classList.add('taken'); btn.disabled=true; btn.setAttribute('aria-disabled','true');
         } else {
             btn.addEventListener('click',()=>{
                 $$('.slot').forEach(s=>s.classList.remove('selected'));
-                btn.classList.add('selected'); container.dataset.selected=String(t);
+                btn.classList.add('selected');
+                container.dataset.selected=String(t);
             });
         }
         container.appendChild(btn);
     }
-
-    if(!container.querySelector('.slot:not(.taken)')){
-        const msg=document.createElement('div');
-        msg.style.color='#b91c4a';
-        msg.style.fontWeight='700';
-        msg.style.textAlign='center';
-        msg.textContent='متاسفانه برای این تاریخ هیچ زمان خالی‌ای وجود ندارد.';
-        container.appendChild(msg);
-    }
 }
+
+function updatePriceBox(){
+    const sel=$el('#service');
+    const price=sel.value;
+    const box=$el('#priceBox');
+    if(!price){box.textContent='لطفاً خدمت و تاریخ را انتخاب کنید'; return;}
+    const deposit=Math.round(Number(price)*0.3);
+    box.textContent='پیش‌پرداخت: '+deposit.toLocaleString('fa-IR')+' تومان';
+}
+
+$el('#service').addEventListener('change',()=>{ updatePriceBox(); generateSlots(); });
 
 function validPhone(s){ const digits=s.replace(/\D/g,''); return /^9\d{9}$/.test(digits)||/^09\d{9}$/.test(digits); }
 
@@ -185,17 +209,18 @@ $el('#payBtn').addEventListener('click', async ()=>{
         price: serviceEl.value,
         date: date,
         start: start,
-        end: start+duration
+        end: start+duration,
+        code: Math.floor(100000 + Math.random()*900000) // کد رهگیری 6 رقمی
     };
 
     try {
-        const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', {
+        const response = await fetch('YOUR_GOOGLE_SHEET_WEB_APP_URL', {
             method: 'POST',
             body: JSON.stringify(reservation)
         });
         const result = await response.json();
         if(result.status==='success'){
-            alert(`نوبت ثبت شد:\n${reservation.service} — ${date} — ${formatPersianHour(reservation.start)}\nپیش‌پرداخت: ${Math.round(Number(serviceEl.value)*0.3).toLocaleString('fa-IR')} تومان`);
+            alert(`نوبت ثبت شد:\n${reservation.service} — ${date} — ${formatPersianHour(reservation.start)}\nکد رهگیری: ${reservation.code}\nپیش‌پرداخت: ${Math.round(Number(serviceEl.value)*0.3).toLocaleString('fa-IR')} تومان`);
             delete $el('#timeList').dataset.selected;
             generateSlots();
         } else {
@@ -207,9 +232,8 @@ $el('#payBtn').addEventListener('click', async ()=>{
     }
 });
 
-window.addEventListener('load',()=>{
-    setTimeout(()=>{ updatePriceBox(); generateSlots(); },250);
-});
+window.addEventListener('load',()=>{ setTimeout(()=>{ updatePriceBox(); generateSlots(); },250); });
+
 })(jQuery);
 </script>
 </body>
