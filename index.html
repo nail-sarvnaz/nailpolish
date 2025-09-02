@@ -73,9 +73,10 @@
       <label for="service">انتخاب خدمت *</label>
       <select id="service" name="service" required>
         <option value="" disabled selected>یک گزینه انتخاب کنید</option>
-        <option value="500000" data-duration="90">کاشت ناخن — ۵۰۰,۰۰۰ تومان (۱.۵ ساعت)</option>
-        <option value="300000" data-duration="30">لمینت — ۳۰۰,۰۰۰ تومان (۳۰ دقیقه)</option>
-        <option value="170000" data-duration="60">ژلیش پا — ۱۷۰,۰۰۰ تومان (۱ ساعت)</option>
+        <option value="500000" data-duration="120">کاشت ناخن — ۵۰۰,۰۰۰ تومان</option>
+        <option value="340000" data-duration="120">ترمیم-لمینت — ۳۴۰,۰۰۰ تومان</option>
+        <option value="180000" data-duration="60">دست — ۱۸۰,۰۰۰ تومان</option>
+        <option value="800000" data-duration="180">دست و پا — ۸۰۰,۰۰۰ تومان</option>
       </select>
 
       <label for="datepicker">تاریخ *</label>
@@ -89,7 +90,7 @@
 
       <div class="meta">
         اینستاگرام: <a href="https://instagram.com/nail_sarvnaz" target="_blank" rel="noopener">@nail_sarvnaz</a>
-        <div>ساعت کاری: ۱۲:۰۰ — ۱۸:۰۰</div>
+        <div>روزهای فرد: ۱۲ ظهر — روزهای زوج: ۱۳ ظهر</div>
       </div>
     </form>
   </main>
@@ -108,8 +109,9 @@ $("#datepicker").persianDatepicker({
     onSelect: function(){ generateSlots(); }
 });
 
-const WORK_START=12*60, WORK_END=18*60, STEP=15, BUFFER=15;
 const KEY='nail_reservations_v1';
+const STEP=60; // فاصله رزروها ۱ ساعت
+const LAST_SLOT=17*60; // آخرین تایم ۵ بعدازظهر
 
 function loadReservations(){ try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[];} }
 function saveReservations(arr){ localStorage.setItem(KEY,JSON.stringify(arr)); }
@@ -118,7 +120,7 @@ function formatPersianHour(minutes){ let h=Math.floor(minutes/60), m=minutes%60;
 $el('#service').addEventListener('change',()=>{ updatePriceBox(); generateSlots(); });
 function updatePriceBox(){ const sel=$el('#service'); const price=sel.value; const box=$el('#priceBox'); if(!price){box.textContent='لطفاً خدمت و تاریخ را انتخاب کنید'; return;} const deposit=Math.round(Number(price)*0.3); box.textContent='پیش‌پرداخت: '+deposit.toLocaleString('fa-IR')+' تومان'; }
 
-function hasConflict(dateStr,startMin,durationMin){ const reservations=loadReservations(); const newStart=startMin; const newEnd=startMin+durationMin+BUFFER; return reservations.some(r=>{ if(r.date!==dateStr)return false; const existingStart=r.start; const existingEnd=r.end+BUFFER; return !(newEnd<=existingStart||newStart>=existingEnd); }); }
+function hasConflict(dateStr,startMin,durationMin){ const reservations=loadReservations(); const newStart=startMin; const newEnd=startMin+durationMin; return reservations.some(r=>{ if(r.date!==dateStr)return false; const existingStart=r.start; const existingEnd=r.end; return !(newEnd<=existingStart||newStart>=existingEnd); }); }
 
 function generateSlots(){
     const serviceOpt=$el('#service').selectedOptions[0];
@@ -127,19 +129,36 @@ function generateSlots(){
     container.innerHTML='';
     $el('#formHint').textContent='';
     if(!serviceOpt||!serviceOpt.dataset.duration||!date)return;
-    const duration=Number(serviceOpt.dataset.duration); updatePriceBox();
-    let anySlot=false;
-    for(let t=WORK_START;t+duration<=WORK_END;t+=STEP){
+
+    const duration=Number(serviceOpt.dataset.duration);
+    const persDate=date.split('/').map(x=>parseInt(x));
+    const day = new Date(persDate[0], persDate[1]-1, persDate[2]).getDate();
+    const startWork = (day%2===1)? 12*60 : 13*60; // شروع فرد/زوج
+
+    for(let t=startWork; t+duration<=LAST_SLOT; t+=STEP){
         const btn=document.createElement('button');
         btn.type='button';
         btn.className='slot';
         btn.textContent=formatPersianHour(t);
-        const conflict=hasConflict(date,t,duration);
-        if(conflict){ btn.classList.add('taken'); btn.disabled=true; btn.setAttribute('aria-disabled','true'); }
-        else{ btn.addEventListener('click',()=>{ $$('.slot').forEach(s=>s.classList.remove('selected')); btn.classList.add('selected'); container.dataset.selected=String(t); }); }
-        container.appendChild(btn); anySlot=true;
+        if(hasConflict(date,t,duration)){
+            btn.classList.add('taken'); btn.disabled=true; btn.setAttribute('aria-disabled','true');
+        } else {
+            btn.addEventListener('click',()=>{
+                $$('.slot').forEach(s=>s.classList.remove('selected'));
+                btn.classList.add('selected'); container.dataset.selected=String(t);
+            });
+        }
+        container.appendChild(btn);
     }
-    if(!anySlot){ const msg=document.createElement('div'); msg.style.color='#b91c4a'; msg.style.fontWeight='700'; msg.style.textAlign='center'; msg.textContent='متاسفانه برای این تاریخ هیچ زمان خالی‌ای وجود ندارد.'; container.appendChild(msg); }
+
+    if(!container.querySelector('.slot:not(.taken)')){
+        const msg=document.createElement('div');
+        msg.style.color='#b91c4a';
+        msg.style.fontWeight='700';
+        msg.style.textAlign='center';
+        msg.textContent='متاسفانه برای این تاریخ هیچ زمان خالی‌ای وجود ندارد.';
+        container.appendChild(msg);
+    }
 }
 
 function validPhone(s){ const digits=s.replace(/\D/g,''); return /^9\d{9}$/.test(digits)||/^09\d{9}$/.test(digits); }
@@ -170,7 +189,7 @@ $el('#payBtn').addEventListener('click', async ()=>{
     };
 
     try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbyqCQRh4Iy3OFLKrK8qzKXYOjBEjBngbZFxYKhuFNl4iZGuCayRwjqry8rLLcyttUmzDA/exec', {
+        const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', {
             method: 'POST',
             body: JSON.stringify(reservation)
         });
