@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>رزرو نوبت ناخن — Nail_Sarvnaz</title>
 
-  <!-- فونت -->
+  <!-- فونت وزیر -->
   <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.003.04/fonts/font-face.css" rel="stylesheet">
 
   <!-- Persian Datepicker -->
@@ -74,8 +74,8 @@
       <select id="service" name="service" required>
         <option value="" disabled selected>یک گزینه انتخاب کنید</option>
         <option value="500000" data-duration="120">کاشت ناخن — ۵۰۰,۰۰۰ تومان</option>
-        <option value="340000" data-duration="120">ترمیم-لمینت — ۳۴۰,۰۰۰ تومان</option>
-        <option value="180000" data-duration="60">دست — ۱۸۰,۰۰۰ تومان</option>
+        <option value="340000" data-duration="120">ترمیم و لمینت — ۳۴۰,۰۰۰ تومان</option>
+        <option value="180000" data-duration="60">ژلیش پا — ۱۸۰,۰۰۰ تومان</option>
         <option value="800000" data-duration="180">دست و پا — ۸۰۰,۰۰۰ تومان</option>
       </select>
 
@@ -90,7 +90,7 @@
 
       <div class="meta">
         اینستاگرام: <a href="https://instagram.com/nail_sarvnaz" target="_blank" rel="noopener">@nail_sarvnaz</a>
-        <div>ساعت کاری: روزهای فرد ۱۲:۰۰ — ۱۷:۰۰، روزهای زوج ۱۳:۰۰ — ۱۷:۰۰</div>
+        <div>ساعت کاری: روزهای فرد از ۱۲ ظهر، روزهای زوج از ۱۳ ظهر</div>
       </div>
     </form>
   </main>
@@ -102,12 +102,13 @@ const $el = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 const pad2 = n => String(n).padStart(2,'0');
 
-const WORK_START_ODD = 12*60;
-const WORK_START_EVEN = 13*60;
-const LAST_SLOT = 17*60;
-const STEP = 60;
-const KEY = 'nail_reservations_v3';
+const WORK_START_ODD=12*60;  // فرد از 12 ظهر
+const WORK_START_EVEN=13*60; // زوج از 13 ظهر
+const LAST_SLOT=17*60;       // آخرین تایم رزرو
+const STEP=60;               // فاصله هر رزرو یک ساعت
+const KEY='nail_reservations_final';
 
+// تابع تبدیل دقیقه به ساعت فارسی
 function formatPersianHour(minutes){
     let h=Math.floor(minutes/60), m=minutes%60;
     const suffix=h>=12?'بعدازظهر':'قبل‌ازظهر';
@@ -117,9 +118,13 @@ function formatPersianHour(minutes){
     return pers(String(hour))+':'+pers(pad2(m))+' '+suffix;
 }
 
-function loadReservations(){ try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[];} }
+// بارگذاری/ذخیره رزروها
+function loadReservations(){ 
+    try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[];} 
+}
 function saveReservations(arr){ localStorage.setItem(KEY,JSON.stringify(arr)); }
 
+// بررسی تداخل با رزرو قبلی
 function hasConflict(dateStr,startMin,durationMin){
     const reservations=loadReservations();
     const newStart=startMin;
@@ -128,42 +133,47 @@ function hasConflict(dateStr,startMin,durationMin){
         if(r.date!==dateStr) return false;
         const existingStart=r.start;
         const existingEnd=r.end;
-        return !(newEnd<=existingStart || newStart>=existingEnd);
+        return !(newEnd<=existingStart||newStart>=existingEnd);
     });
 }
 
+// تولید تایم‌های رزرو
 function generateSlots(){
-    const serviceOpt=$el('#service').selectedOptions[0];
-    const date=$el('#datepicker').val ? $el('#datepicker').val() : $el('#datepicker').value;
-    const container=$el('#timeList');
+    const serviceEl = $el('#service').selectedOptions[0];
+    const date = $el('#datepicker').val || $el('#datepicker').value;
+    const container = $el('#timeList');
     container.innerHTML='';
     $el('#formHint').textContent='';
-    if(!serviceOpt||!serviceOpt.dataset.duration||!date) return;
+    if(!serviceEl || !serviceEl.dataset.duration || !date) return;
 
-    const duration=Number(serviceOpt.dataset.duration);
-    const parts = date.split('/');
-    const dayNum = parseInt(parts[2],10);
-    const startWork = (dayNum%2===1)? WORK_START_ODD : WORK_START_EVEN;
+    const duration = Number(serviceEl.dataset.duration);
+    const persDate = date.split('/').map(x=>parseInt(x)); // YYYY/MM/DD
+    const day = new persianDate([persDate[0], persDate[1]-1, persDate[2]]).day();
+    const startWork = (day%2===1)? WORK_START_ODD : WORK_START_EVEN;
 
-    for(let t=startWork; t+duration <= LAST_SLOT; t+=STEP){
-        const btn=document.createElement('button');
+    for(let t=startWork; t+duration<=LAST_SLOT; t+=STEP){
+        const btn = document.createElement('button');
         btn.type='button';
         btn.className='slot';
-        btn.textContent=formatPersianHour(t);
+        btn.textContent = formatPersianHour(t);
+
         if(hasConflict(date,t,duration)){
-            btn.classList.add('taken'); btn.disabled=true; btn.setAttribute('aria-disabled','true');
+            btn.classList.add('taken'); 
+            btn.disabled=true; 
+            btn.setAttribute('aria-disabled','true');
         } else {
-            btn.addEventListener('click',()=>{
+            btn.addEventListener('click', ()=>{
                 $$('.slot').forEach(s=>s.classList.remove('selected'));
-                btn.classList.add('selected');
-                container.dataset.selected=String(t);
+                btn.classList.add('selected'); 
+                container.dataset.selected = String(t);
             });
         }
+
         container.appendChild(btn);
     }
 
     if(!container.querySelector('.slot:not(.taken)')){
-        const msg=document.createElement('div');
+        const msg = document.createElement('div');
         msg.style.color='#b91c4a';
         msg.style.fontWeight='700';
         msg.style.textAlign='center';
@@ -172,35 +182,49 @@ function generateSlots(){
     }
 }
 
+// بروزرسانی قیمت پیش‌پرداخت
 function updatePriceBox(){
-    const sel=$el('#service');
-    const price=sel.value;
-    const box=$el('#priceBox');
-    if(!price){ box.textContent='لطفاً خدمت و تاریخ را انتخاب کنید'; return; }
-    const deposit=Math.round(Number(price)*0.3);
+    const sel = $el('#service');
+    const price = sel.value;
+    const box = $el('#priceBox');
+    if(!price){
+        box.textContent='لطفاً خدمت و تاریخ را انتخاب کنید';
+        return;
+    }
+    const deposit = Math.round(Number(price)*0.3);
     box.textContent='پیش‌پرداخت: '+deposit.toLocaleString('fa-IR')+' تومان';
 }
 
+// اعتبارسنجی شماره موبایل
+function validPhone(s){ 
+    const digits=s.replace(/\D/g,''); 
+    return /^9\d{9}$/.test(digits)||/^09\d{9}$/.test(digits); 
+}
+
+// تاریخ شمسی با روز درست ایران
+let now = new Date();
+let pdNow = new persianDate(now);
+
 $("#datepicker").persianDatepicker({
     format: "YYYY/MM/DD",
-    minDate: new persianDate().unix(),
+    minDate: pdNow,
     autoClose: true,
     onSelect: function(){ generateSlots(); updatePriceBox(); }
 });
 
-$el('#service').addEventListener('change',()=>{
+// تغییر خدمت
+$el('#service').addEventListener('change', ()=>{
     updatePriceBox();
     generateSlots();
 });
 
-function validPhone(s){ const digits=s.replace(/\D/g,''); return /^9\d{9}$/.test(digits)||/^09\d{9}$/.test(digits); }
-
+// ثبت رزرو (ارسال به گوگل شیت یا ذخیره لوکال)
 $el('#payBtn').addEventListener('click', async ()=>{
-    const fullname=$el('#fullname').value.trim();
-    const phone=$el('#phone').value.trim();
-    const serviceEl=$el('#service').selectedOptions[0];
-    const date=$el('#datepicker').val ? $el('#datepicker').val() : $el('#datepicker').value;
-    const selectedStart=$el('#timeList').dataset.selected;
+    const fullname = $el('#fullname').value.trim();
+    const phone = $el('#phone').value.trim();
+    const serviceEl = $el('#service').selectedOptions[0];
+    const date = $el('#datepicker').val || $el('#datepicker').value;
+    const selectedStart = $el('#timeList').dataset.selected;
 
     if(!fullname||!phone){ $el('#formHint').textContent='نام و شماره موبایل باید وارد شود.'; return; }
     if(!validPhone(phone)){ $el('#formHint').textContent='شماره موبایل معتبر وارد کنید (مثال: 09123456789).'; return; }
@@ -209,6 +233,8 @@ $el('#payBtn').addEventListener('click', async ()=>{
     if(!selectedStart){ $el('#formHint').textContent='لطفاً یک زمان از لیست انتخاب کنید.'; return; }
 
     const duration=Number(serviceEl.dataset.duration), start=Number(selectedStart);
+    const code=Math.floor(100000+Math.random()*900000);
+
     const reservation={
         name: fullname,
         phone: phone,
@@ -217,31 +243,19 @@ $el('#payBtn').addEventListener('click', async ()=>{
         date: date,
         start: start,
         end: start+duration,
-        code: Math.floor(100000+Math.random()*900000)
+        code: code
     };
 
-    try {
-        const response = await fetch('YOUR_GOOGLE_SHEET_WEBAPP_URL', {
-            method: 'POST',
-            body: JSON.stringify(reservation)
-        });
-        const result = await response.json();
-        if(result.status==='success'){
-            alert(`نوبت ثبت شد:\n${reservation.service} — ${date} — ${formatPersianHour(reservation.start)}\nکد رهگیری: ${reservation.code}\nپیش‌پرداخت: ${Math.round(Number(serviceEl.value)*0.3).toLocaleString('fa-IR')} تومان`);
-            delete $el('#timeList').dataset.selected;
-            generateSlots();
-        } else {
-            $el('#formHint').textContent='خطا در ثبت رزرو، لطفاً دوباره تلاش کنید.';
-        }
-    } catch(err){
-        console.error(err);
-        $el('#formHint').textContent='خطا در اتصال به سرور.';
-    }
+    // ذخیره لوکال
+    let allRes = loadReservations();
+    allRes.push(reservation);
+    saveReservations(allRes);
+
+    alert(`نوبت ثبت شد:\n${reservation.service} — ${date} — ${formatPersianHour(reservation.start)}\nکد رهگیری: ${reservation.code}\nپیش‌پرداخت: ${Math.round(Number(serviceEl.value)*0.3).toLocaleString('fa-IR')} تومان`);
+    delete $el('#timeList').dataset.selected;
+    generateSlots();
 });
 
-window.addEventListener('load',()=>{
-    setTimeout(()=>{ updatePriceBox(); generateSlots(); },250);
-});
 })(jQuery);
 </script>
 </body>
